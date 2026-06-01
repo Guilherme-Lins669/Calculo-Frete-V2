@@ -10,21 +10,46 @@ HISTORY_FILE = "history.json"
 
 
 def get_region(cep):
-    prefix = int(cep[:2])
+    prefix = int(cep.replace("-", "")[:5])
 
-    if 1 <= prefix <= 28:
+    # Sudeste
+    if 1000 <= prefix <= 19999:   # SP
         return "Sudeste"
-    elif 29 <= prefix <= 39:
+    if 20000 <= prefix <= 29999:  # RJ + ES
+        return "Sudeste"
+    if 30000 <= prefix <= 39999:  # MG
+        return "Sudeste"
+
+    # Nordeste
+    if 40000 <= prefix <= 48999:  # BA
         return "Nordeste"
-    elif 40 <= prefix <= 49:
-        return "Bahia"
-    elif 50 <= prefix <= 65:
-        return "Nordeste Interior"
-    elif 66 <= prefix <= 68:
+    if 49000 <= prefix <= 49999:  # SE
+        return "Nordeste"
+    if 50000 <= prefix <= 56999:  # PE
+        return "Nordeste"
+    if 57000 <= prefix <= 57999:  # AL
+        return "Nordeste"
+    if 58000 <= prefix <= 58999:  # PB
+        return "Nordeste"
+    if 59000 <= prefix <= 59999:  # RN
+        return "Nordeste"
+    if 60000 <= prefix <= 63999:  # CE
+        return "Nordeste"
+    if 64000 <= prefix <= 64999:  # PI
+        return "Nordeste"
+    if 65000 <= prefix <= 65999:  # MA
+        return "Nordeste"
+
+    # Norte
+    if 66000 <= prefix <= 69999:  # PA, AP, AM, RR, AC
         return "Norte"
-    elif 69 <= prefix <= 79:
+
+    # Centro-Oeste
+    if 70000 <= prefix <= 79999:  # DF, GO, RO, TO, MT, MS
         return "Centro-Oeste"
-    elif 80 <= prefix <= 99:
+
+    # Sul
+    if 80000 <= prefix <= 99999:  # PR, SC, RS
         return "Sul"
 
     return "Desconhecida"
