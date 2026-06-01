@@ -116,9 +116,22 @@ def index():
 
     if request.method == "POST":
 
+        origin_cep = request.form.get("origin_cep", "").replace("-", "").strip()
+        destination_cep = request.form.get("destination_cep", "").replace("-", "").strip()
+
+        error = None
+        if not origin_cep.isdigit() or len(origin_cep) != 8:
+            error = "CEP de origem inválido. Digite apenas 8 números."
+        elif not destination_cep.isdigit() or len(destination_cep) != 8:
+            error = "CEP de destino inválido. Digite apenas 8 números."
+
+        if error:
+            history = load_history()
+            return render_template("index.html", error=error, history=history, show_history=len(history) > 0)
+
         data = {
-            "origin_cep": request.form.get("origin_cep"),
-            "destination_cep": request.form.get("destination_cep"),
+            "origin_cep": origin_cep,
+            "destination_cep": destination_cep,
             "weight": request.form.get("weight"),
             "height": request.form.get("height"),
             "width": request.form.get("width"),
