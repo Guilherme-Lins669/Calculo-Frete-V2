@@ -20,12 +20,12 @@
 
             <div class="input-group">
                 <label>Cep Origem:</label>
-                <input type="text" name="origin_cep" placeholder="00000000" required>
+                <input type="text" name="origin_cep" inputmode="numeric" pattern="\d{8}" maxlength="8" placeholder="00000000" required>
             </div>
 
             <div class="input-group">
                 <label>Cep Destino:</label>
-                <input type="text" name="destination_cep" placeholder="00000000" required>
+                <input type="text" name="destination_cep" inputmode="numeric" pattern="\d{8}" maxlength="8" placeholder="00000000" required>
             </div>
 
             <div class="grid">
@@ -56,6 +56,10 @@
                 <input type="checkbox" name="express">
                 <span>Entrega expressa</span>
             </div>
+
+            {% if error %}
+            <p class="error-msg">⚠️ {{ error }}</p>
+            {% endif %}
 
             <button type="submit">
                 Calcular
