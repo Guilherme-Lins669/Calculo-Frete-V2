@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreteFácil</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="main-container">
+
+    <!-- ESQUERDA -->
+    <div class="left-panel">
+
+        <h1>FreteFácil</h1>
+
+        <form method="POST">
+
+            <div class="input-group">
+                <label>Cep Origem:</label>
+                <input type="text" name="origin_cep" placeholder="00000000" required>
+            </div>
+
+            <div class="input-group">
+                <label>Cep Destino:</label>
+                <input type="text" name="destination_cep" placeholder="00000000" required>
+            </div>
+
+            <div class="grid">
+
+                <div class="input-group">
+                    <label>Peso (Kg):</label>
+                    <input type="number" step="0.1" name="weight" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Largura (cm):</label>
+                    <input type="number" step="0.1" name="width" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Altura (cm):</label>
+                    <input type="number" step="0.1" name="height" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Comprimento (cm):</label>
+                    <input type="number" step="0.1" name="length" required>
+                </div>
+
+            </div>
+
+            <div class="checkbox">
+                <input type="checkbox" name="express">
+                <span>Entrega expressa</span>
+            </div>
+
+            <button type="submit">
+                Calcular
+            </button>
+
+        </form>
+
+    </div>
+
+    <!-- DIREITA -->
+    <div class="right-panel">
+
+        {% if result %}
+
+        <h2 class="section-title">Resultado:</h2>
+
+        <div class="card">
+
+            <p><strong>Preço:</strong> R$ {{ result.price }}</p>
+            <p><strong>Prazo:</strong> {{ result.delivery_days }}</p>
+            <p><strong>Peso Cubado:</strong> {{ result.cubed_weight }}</p>
+            <p><strong>Peso Final:</strong> {{ result.final_weight }}</p>
+            <p><strong>Origem:</strong> {{ result.origin_region }}</p>
+            <p><strong>Destino:</strong> {{ result.destination_region }}</p>
+
+        </div>
+
+        {% endif %}
+
+        {% if show_history %}
+
+        <h2 class="section-title">Histórico:</h2>
+
+        <form action="/clear-history" method="POST">
+
+            <button class="clear-btn" type="submit">
+                Limpar Histórico
+            </button>
+
+        </form>
+
+        <div class="card history-card">
+
+            {% for item in history %}
+                <div class="history-item">
+
+                    <p>{{ item.date }}</p>
+
+                    <p>{{ item.origin }} → {{ item.destination }}</p>
+
+                    <strong>R$ {{ item.price }}</strong>
+
+                    <hr>
+
+                </div>
+            {% endfor %}
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+</body>
+</html>
