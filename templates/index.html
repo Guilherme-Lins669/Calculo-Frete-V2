@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FreteFácil</title>
-
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -19,51 +18,57 @@
         <form method="POST">
 
             <div class="input-group">
-                <label>Cep Origem:</label>
-                <input type="text" name="origin_cep" inputmode="numeric" pattern="\d{8}" maxlength="8" placeholder="00000000" required>
+                <label>CEP Origem:</label>
+                <input type="text" name="origin_cep" inputmode="numeric" pattern="\d{5}-\d{3}" maxlength="9" placeholder="00000-000" required>
             </div>
 
             <div class="input-group">
-                <label>Cep Destino:</label>
-                <input type="text" name="destination_cep" inputmode="numeric" pattern="\d{8}" maxlength="8" placeholder="00000000" required>
+                <label>CEP Destino:</label>
+                <input type="text" name="destination_cep" inputmode="numeric" pattern="\d{5}-\d{3}" maxlength="9" placeholder="00000-000" required>
             </div>
 
             <div class="grid">
 
                 <div class="input-group">
-                    <label>Peso (Kg):</label>
-                    <input type="number" step="0.1" name="weight" required>
+                    <label>Peso (kg):</label>
+                    <input type="number" step="0.1" min="0.1" name="weight" required>
                 </div>
 
                 <div class="input-group">
                     <label>Largura (cm):</label>
-                    <input type="number" step="0.1" name="width" required>
+                    <input type="number" step="0.1" min="0.1" name="width" required>
                 </div>
 
                 <div class="input-group">
                     <label>Altura (cm):</label>
-                    <input type="number" step="0.1" name="height" required>
+                    <input type="number" step="0.1" min="0.1" name="height" required>
                 </div>
 
                 <div class="input-group">
                     <label>Comprimento (cm):</label>
-                    <input type="number" step="0.1" name="length" required>
+                    <input type="number" step="0.1" min="0.1" name="length" required>
                 </div>
 
             </div>
 
-            <div class="checkbox">
-                <input type="checkbox" name="express">
-                <span>Entrega expressa</span>
+            <div class="input-group" style="margin-top: 10px;">
+                <label>Valor do Produto(R$): <span class="label-hint"></span></label>
+                <input type="number" step="0.01" min="0" name="declared_value" placeholder="0,00">
             </div>
+
+            <label class="express-toggle">
+                <input type="checkbox" name="express">
+                <span class="toggle-track">
+                    <span class="toggle-thumb"></span>
+                </span>
+                <span class="toggle-label">Entrega expressa</span>
+            </label>
 
             {% if error %}
             <p class="error-msg">⚠️ {{ error }}</p>
             {% endif %}
 
-            <button type="submit">
-                Calcular
-            </button>
+            <button type="submit">Calcular</button>
 
         </form>
 
@@ -78,12 +83,67 @@
 
         <div class="card">
 
-            <p><strong>Preço:</strong> R$ {{ result.price }}</p>
-            <p><strong>Prazo:</strong> {{ result.delivery_days }} Dias</p>
-            <p><strong>Peso Cubado:</strong> {{ result.cubed_weight }}</p>
-            <p><strong>Peso Final:</strong> {{ result.final_weight }}</p>
-            <p><strong>Origem:</strong> {{ result.origin_region }}</p>
-            <p><strong>Destino:</strong> {{ result.destination_region }}</p>
+            <div class="result-total">
+                <span class="result-label">Total</span>
+                <span class="result-price">R$ {{ "%.2f"|format(result.price) }}</span>
+            </div>
+
+            <div class="result-meta">
+                <div class="meta-item">
+                    <span class="meta-label">Prazo</span>
+                    <span class="meta-value">{{ result.delivery_days }} dia{% if result.delivery_days != 1 %}s{% endif %}{% if result.express %} ⚡{% endif %}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Origem</span>
+                    <span class="meta-value">{{ result.origin_region }}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Destino</span>
+                    <span class="meta-value">{{ result.destination_region }}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Peso real</span>
+                    <span class="meta-value">{{ result.final_weight }} kg</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Peso cubado</span>
+                    <span class="meta-value">{{ result.cubed_weight }} kg</span>
+                </div>
+            </div>
+
+            <div class="breakdown">
+                <p class="breakdown-title">Composição do frete:</p>
+                <div class="breakdown-row">
+                    <span>Frete peso</span>
+                    <span>R$ {{ "%.2f"|format(result.frete_peso) }}</span>
+                </div>
+                {% if result.regional_fee > 0 %}
+                <div class="breakdown-row">
+                    <span>Taxa interestadual</span>
+                    <span>R$ {{ "%.2f"|format(result.regional_fee) }}</span>
+                </div>
+                {% endif %}
+                {% if result.gris > 0 %}
+                <div class="breakdown-row">
+                    <span>GRIS (0,4%)</span>
+                    <span>R$ {{ "%.2f"|format(result.gris) }}</span>
+                </div>
+                {% endif %}
+                <div class="breakdown-row">
+                    <span>ADEME</span>
+                    <span>R$ {{ "%.2f"|format(result.taxa_ademe) }}</span>
+                </div>
+                <div class="breakdown-row">
+                    <span>TDA</span>
+                    <span>R$ {{ "%.2f"|format(result.taxa_tda) }}</span>
+                </div>
+                {% if result.express %}
+                <div class="breakdown-row express-row">
+                    <span>Expresso (×1,4)</span>
+                    <span>incluído</span>
+                </div>
+                {% endif %}
+            </div>
 
         </div>
 
@@ -94,29 +154,23 @@
         <h2 class="section-title">Histórico:</h2>
 
         <form action="/clear-history" method="POST">
-
-            <button class="clear-btn" type="submit">
-                Limpar Histórico
-            </button>
-
+            <button class="clear-btn" type="submit">Limpar Histórico</button>
         </form>
 
-        <div class="card history-card">
-
+        <div class="history-list">
             {% for item in history %}
-                <div class="history-item">
-
-                    <p>{{ item.date }}</p>
-
-                    <p>{{ item.origin }} → {{ item.destination }}</p>
-
-                    <strong>R$ {{ item.price }}</strong>
-
-                    <hr>
-
+            <div class="history-card-item">
+                <div class="history-card-top">
+                    <span class="history-date">🕐 {{ item.date }}</span>
+                    <span class="history-price">R$ {{ "%.2f"|format(item.price) }}</span>
                 </div>
+                <div class="history-route">
+                    <span class="history-cep">{{ item.origin[:5] }}-{{ item.origin[5:] }}</span>
+                    <span class="history-arrow">→</span>
+                    <span class="history-cep">{{ item.destination[:5] }}-{{ item.destination[5:] }}</span>
+                </div>
+            </div>
             {% endfor %}
-
         </div>
 
         {% endif %}
@@ -124,6 +178,24 @@
     </div>
 
 </div>
+
+<script>
+    function formatCEP(input) {
+        let value = input.value.replace(/\D/g, "");        // remove tudo que não é número
+        if (value.length > 5) {
+            value = value.slice(0, 5) + "-" + value.slice(5, 8);
+        }
+        input.value = value;
+    }
+
+    document.querySelector('[name="origin_cep"]').addEventListener("input", function() {
+        formatCEP(this);
+    });
+
+    document.querySelector('[name="destination_cep"]').addEventListener("input", function() {
+        formatCEP(this);
+    });
+</script>
 
 </body>
 </html>
